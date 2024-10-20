@@ -2,11 +2,10 @@ package com.DeliveryProject.Delivery.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.DeliveryProject.Delivery.dto.PaymentDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.DeliveryProject.Delivery.exceptions.MarketNotFoundException;
 import com.DeliveryProject.Delivery.payment.PaymentEntity;
@@ -14,13 +13,12 @@ import com.DeliveryProject.Delivery.payment.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
-//Classe responsável pelo registro do pagamento no banco de dados, tanto para getar os carrinhos cadastrados, quanto para
-//cadastrar novos
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
+	@Autowired
 	private final PaymentService paymentService;
 
 	@GetMapping
@@ -29,8 +27,18 @@ public class PaymentController {
 	}
 
 	@PostMapping
-	public PaymentEntity create(@RequestBody PaymentEntity payment) throws MarketNotFoundException {
+	public PaymentEntity create(@RequestBody PaymentDTO payment) throws MarketNotFoundException {
 		return paymentService.create(payment);
+	}
+
+	@PostMapping("/payAuth")
+	public ResponseEntity<?> doPayAuth(){
+		return ResponseEntity.ok().body(paymentService.doPaymentAuth());
+	}
+
+	@PostMapping("/validate2fa")
+	public ResponseEntity<?> validate2Fa(@RequestParam String code){
+		return ResponseEntity.ok().body(paymentService.validate2fa(code));
 	}
 
 }
